@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
 const { Client } = require('pg');
+const cors = require('cors');
 
 const SECRET = process.env.JWT_SECRET || 'supersecretkey';
 
@@ -36,16 +37,28 @@ function authenticateToken(req) {
   }
 }
 
+// Configure CORS
+const corsOptions = {
+  origin: '*',
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: false
+};
+
 module.exports = async function handler(req, res) {
-  // Set CORS headers for all requests
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  res.setHeader('Access-Control-Max-Age', '86400');
+  // Apply CORS
+  await new Promise((resolve, reject) => {
+    cors(corsOptions)(req, res, (result) => {
+      if (result instanceof Error) {
+        return reject(result);
+      }
+      return resolve(result);
+    });
+  });
   
+  // Handle preflight OPTIONS request
   if (req.method === 'OPTIONS') {
-    res.status(200).end();
-    return;
+    return res.status(200).end();
   }
 
   try {
