@@ -1,0 +1,12 @@
+node_modules
+.env
+*.log
+.DS_Store
+server.js
+migrate*.js
+test*.js
+quick-test.js
+simple-test.js
+add-test-event.js
+events.json
+users.json
